@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 import fetchSynonyms from "./api/fetchSynonyms";
@@ -18,7 +18,7 @@ function App() {
     setWord(word);
   };
 
-  const handleFindSynonyms = async (e: React.FormEvent) => {
+/*   const handleFindSynonyms = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -27,12 +27,25 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  };
+  }; */
+
+  useEffect(() => {
+    const handleFindSynonyms = async () => {
+      try {
+        const fetchedSynonyms = await fetchSynonyms(word);
+        setSynonyms(fetchedSynonyms);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    handleFindSynonyms();
+  }, [word]);
 
   return (
     <div>
       {word}
-      <form onClick={handleFindSynonyms}>
+      <form /* onClick={handleFindSynonyms} */>
         <label htmlFor="finder">Type a word: </label>
         <input
           id="finder"
