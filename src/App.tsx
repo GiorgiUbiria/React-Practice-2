@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import useSWR from "swr";
 import "./App.css";
 
 import fetchSynonyms from "./api/fetchSynonyms";
@@ -10,42 +11,20 @@ type TSynonyms = {
 
 function App() {
   const [word, setWord] = useState("");
-  const [synonyms, setSynonyms] = useState<TSynonyms[]>([]);
+  const { data: synonyms, error } = useSWR(word, fetchSynonyms);
 
   const handleFetchNewSynonyms = async (word: string) => {
-    const fetchedSynonyms = await fetchSynonyms(word);
-    setSynonyms(fetchedSynonyms);
     setWord(word);
   };
 
-/*   const handleFindSynonyms = async (e: React.FormEvent) => {
-    e.preventDefault();
+  console.log(synonyms);
 
-    try {
-      const fetchedSynonyms = await fetchSynonyms(word);
-      setSynonyms(fetchedSynonyms);
-    } catch (error) {
-      console.error(error);
-    }
-  }; */
-
-  useEffect(() => {
-    const handleFindSynonyms = async () => {
-      try {
-        const fetchedSynonyms = await fetchSynonyms(word);
-        setSynonyms(fetchedSynonyms);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    handleFindSynonyms();
-  }, [word]);
+  if (error) return <div>Failed to load synonyms</div>;
 
   return (
     <div>
       {word}
-      <form /* onClick={handleFindSynonyms} */>
+      <form>
         <label htmlFor="finder">Type a word: </label>
         <input
           id="finder"
@@ -55,7 +34,7 @@ function App() {
         <button> Submit </button>
       </form>
       <ul>
-        {synonyms.map((synonym, idx) => (
+        {synonyms?.map((synonym: TSynonyms, idx: number) => (
           <li key={idx} onClick={() => handleFetchNewSynonyms(synonym.word)}>
             {" "}
             {synonym.word}{" "}
